@@ -1,0 +1,17 @@
+// package.json
+{
+  "name": "camera-security-scanner",
+  "version": "1.0.0",
+  "description": "Advanced Camera Security Testing Tool",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'Build complete'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
